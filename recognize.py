@@ -97,12 +97,13 @@ def recognize(args):
                 cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
 
     # show the output image
-    # cv2.imshow("Image", image)
-    # cv2.waitKey(0)
+    cv2.imshow("Image", image)
+    cv2.waitKey(0)
     return {'preds': preds, 'classes': le.classes_, 'image': image}
 
+
 if __name__ ==  "__main__":
-    image = Image.open('../MyApp/face.png')
+    image = Image.open('/Users/misterbrainley/FaceNet/dataset/chidi/0001.jpg')
     H, W = image.size[0], image.size[1]
     image = np.array(image.getdata()).reshape(W, H, 3).astype(np.uint8)
     args = {
@@ -112,4 +113,4 @@ if __name__ ==  "__main__":
         'recognizer': 'output/recognizer.pickle', 
         'le': 'output/le.pickle', 'confidence': 0.5
     }
-    recognize(args)
+    recognize(args)    
