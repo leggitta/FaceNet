@@ -13,28 +13,17 @@ from PIL import Image
 
 app = Flask(__name__, template_folder='.')
 
+# load models
+detector = cv2.dnn.readNetFromCaffe(
+    'models/face_detection_model/deploy.prototxt',
+    'models/face_detection_model/res10_300x300_ssd_iter_140000.caffemodel',
+)
+embedder = cv2.dnn.readNetFromTorch('models/openface_nn4.small2.v1.t7')
+recognizer = pickle.loads(open('models/recognizer.pickle', 'rb').read())
+le = pickle.loads(open('models/le.pickle', 'rb').read())
 
-def recognize(args):
 
-    # load our serialized face detector from disk
-    print("[INFO] loading face detector...")
-    protoPath = os.path.sep.join([args["detector"], "deploy.prototxt"])
-    modelPath = os.path.sep.join([args["detector"],
-        "res10_300x300_ssd_iter_140000.caffemodel"])
-    detector = cv2.dnn.readNetFromCaffe(protoPath, modelPath)
-
-    # load our serialized face embedding model from disk
-    print("[INFO] loading face recognizer...")
-    embedder = cv2.dnn.readNetFromTorch(args["embedding_model"])
-
-    # load the actual face recognition model along with the label encoder
-    recognizer = pickle.loads(open(args["recognizer"], "rb").read())
-    le = pickle.loads(open(args["le"], "rb").read())
-
-    # load the image, resize it to have a width of 600 pixels (while
-    # maintaining the aspect ratio), and then grab the image dimensions
-    #image = cv2.imread(args["image"])
-    image = args["image"]
+def recognize(image, conf=0.5):
     image = imutils.resize(image, width=600)
     (h, w) = image.shape[:2]
 
@@ -55,7 +44,7 @@ def recognize(args):
         confidence = detections[0, 0, i, 2]
 
         # filter out weak detections
-        if confidence > args["confidence"]:
+        if confidence > conf:
             # compute the (x, y)-coordinates of the bounding box for the
             # face
             box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
@@ -96,9 +85,6 @@ def recognize(args):
             cv2.putText(image, text, (startX, y),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
 
-    # show the output image
-    # cv2.imshow("Image", image)
-    # cv2.waitKey(0)
     return {'preds': preds, 'classes': le.classes_, 'image': image}
 
 @app.route('/')
@@ -121,14 +107,7 @@ def upload():
             W, H, 3).astype(np.uint8)
         
         print(X.shape)
-        args = {
-            'image': X[:, :, ::-1],
-            'detector': 'models/face_detection_model',
-            'embedding_model': 'models/openface_nn4.small2.v1.t7',
-            'recognizer': 'models/recognizer.pickle',
-            'le': 'models/le.pickle', 'confidence': 0.5
-        }
-        retval = recognize(args)
+        retval = recognize(X[:, :, ::-1])
 
         X = retval['image']
         W = X.shape[0]
