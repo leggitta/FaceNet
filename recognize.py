@@ -1,10 +1,3 @@
-# USAGE
-# python recognize.py --detector face_detection_model \
-#   --embedding-model openface_nn4.small2.v1.t7 \
-#   --recognizer output/recognizer.pickle \
-#   --le output/le.pickle --image images/adrian.jpg
-
-# import the necessary packages
 import numpy as np
 import argparse
 import imutils
@@ -97,8 +90,8 @@ def recognize(args):
                 cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
 
     # show the output image
-    cv2.imshow("Image", image)
-    cv2.waitKey(0)
+    # cv2.imshow("Image", image)
+    # cv2.waitKey(0)
     return {'preds': preds, 'classes': le.classes_, 'image': image}
 
 
@@ -108,9 +101,9 @@ if __name__ ==  "__main__":
     image = np.array(image.getdata()).reshape(W, H, 3).astype(np.uint8)
     args = {
         'image': image[:, :, ::-1], 
-        'detector': 'face_detection_model', 
-        'embedding_model': 'openface_nn4.small2.v1.t7', 
-        'recognizer': 'output/recognizer.pickle', 
-        'le': 'output/le.pickle', 'confidence': 0.5
+        'detector': 'models/face_detection_model', 
+        'embedding_model': 'models/openface_nn4.small2.v1.t7', 
+        'recognizer': 'models/recognizer.pickle', 
+        'le': 'models/le.pickle', 'confidence': 0.5
     }
     recognize(args)    

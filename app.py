@@ -14,7 +14,7 @@ app = Flask(__name__, template_folder='.')
 
 @app.route('/')
 def hello():
-    return render_template('upload.html')
+    return render_template('html/upload.html')
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
@@ -34,10 +34,10 @@ def upload():
         print(X.shape)
         args = {
             'image': X[:, :, ::-1],
-            'detector': 'face_detection_model',
-            'embedding_model': 'openface_nn4.small2.v1.t7',
-            'recognizer': 'output/recognizer.pickle',
-            'le': 'output/le.pickle', 'confidence': 0.5
+            'detector': 'models/face_detection_model',
+            'embedding_model': 'models/openface_nn4.small2.v1.t7',
+            'recognizer': 'models/recognizer.pickle',
+            'le': 'models/le.pickle', 'confidence': 0.5
         }
         retval = recognize(args)
 
@@ -64,7 +64,7 @@ def upload():
         # render template
         script, div = components(p)
         html = render_template(
-            'bokeh.html',
+            'html/bokeh.html',
             plot_script=script,
             plot_div=div,
             js_resources=js_resources,
