@@ -11,7 +11,7 @@ import pickle
 from PIL import Image
 
 
-app = Flask(__name__, template_folder='.')
+app = Flask(__name__)
 
 # load models
 detector = cv2.dnn.readNetFromCaffe(
@@ -89,7 +89,7 @@ def recognize(image, conf=0.5):
 
 @app.route('/')
 def hello():
-    return render_template('html/upload.html')
+    return render_template("index.html")
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
@@ -132,7 +132,7 @@ def upload():
         # render template
         script, div = components(p)
         html = render_template(
-            'html/bokeh.html',
+            'bokeh.html',
             plot_script=script,
             plot_div=div,
             js_resources=js_resources,
